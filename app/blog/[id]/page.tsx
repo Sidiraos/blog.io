@@ -1,11 +1,25 @@
-import { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next'
 
 export const dynamicParams = false;
-
-export const metadata: Metadata = {
-    title: 'Code.io-Blog',
-	description: 'articles des developpeurs',
-};
+ 
+type Props = {
+  params: { id: string }
+}
+ 
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  // read route params
+  const id = params.id
+  // fetch data
+  const article = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`).then((res) => res.json())
+  return {
+    title: article.title,
+    description : article.body
+  }
+}
+ 
 
 // Return a list of `params` to populate the [slug] dynamic segment
 export async function generateStaticParams() {
@@ -27,15 +41,12 @@ export async function generateStaticParams() {
   async function getPost(id : string) {
     const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`)
     const post = await res.json()
-   
     return post
   }
 
-const Page = async ({ params } : {params : {id : string}}) => {
+const Page = async ({ params } : Props) => {
     const post = await getPost(params.id);
-    console.log(post);
-    metadata.title = post.title;
-    metadata.description = post.body;
+    // console.log(post);
 	return (
         <section>
             <h1 className='text-3xl font-medium text-slate-800 text-center mt-10'>{post.title}</h1>

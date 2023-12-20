@@ -1,11 +1,24 @@
-import { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from 'next'
 import UserInfo from "@/components/Users/UserInfo";
 export const dynamicParams = false;
 
-export const metadata: Metadata = {
-    title: 'Details de',
-	description: 'Details des utilisateurs de Code.io',
-};
+type Props = {
+  params: { id: string }
+}
+ 
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  // read route params
+  const id = params.id
+  // fetch data
+  const user = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`).then((res) => res.json())
+  return {
+    title: user.username,
+    description : `detail de l'utilisateur ${user.username}`
+  }
+}
 
 type UserType  = {
     id: number;
@@ -36,9 +49,9 @@ async function getDataUser(id : string) {
   return post
 }
 
-const Page = async ({ params } : {params : {id : string}}) => {
+const Page = async ({ params } : Props) => {
   const user = await getDataUser(params.id);
-    console.log(user);
+    // console.log(user);
 
     const userData : UserType = {
         id: user.id,
@@ -48,7 +61,6 @@ const Page = async ({ params } : {params : {id : string}}) => {
         website : user.website,
         phone : user.phone
     }
-    metadata.title = `Detail de ${user.username}`;
   return (
     <UserInfo userData = {userData} />
   )

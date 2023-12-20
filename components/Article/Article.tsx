@@ -31,7 +31,7 @@ const Article = ({
 				</h4>
 				<p className="mb-5 mt-2">{paragraph}</p>
 			</div>
-			<Link href={`/${link}`} className="text-blue-600 underline">
+			<Link href={`/${link}`} className="text-blue-600 underline hover:text-blue-800">
 				{textLink}
 			</Link>
 		</article>
